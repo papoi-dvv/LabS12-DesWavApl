@@ -1,0 +1,179 @@
+// 1. Miguel de Cervantes
+{
+  "name": "Miguel de Cervantes",
+  "email": "cervantes@universal.com",
+  "nationality": "España",
+  "birthYear": 1547,
+  "bio": "Máxima figura de la literatura española, creador de la novela moderna."
+}
+
+// 2. William Shakespeare
+{
+  "name": "William Shakespeare",
+  "email": "shakespeare@universal.com",
+  "nationality": "Reino Unido",
+  "birthYear": 1564,
+  "bio": "El dramaturgo más importante de la historia, maestro de las tragedias humanas."
+}
+
+// 3. Edgar Allan Poe
+{
+  "name": "Edgar Allan Poe",
+  "email": "poe@universal.com",
+  "nationality": "Estados Unidos",
+  "birthYear": 1809,
+  "bio": "Maestro del terror de la narrativa gótica y pionero del relato detectivesco."
+}
+
+// 4. Fyodor Dostoevsky
+{
+  "name": "Fyodor Dostoevsky",
+  "email": "dostoevsky@universal.com",
+  "nationality": "Rusia",
+  "birthYear": 1821,
+  "bio": "Explorador profundo de la psicología humana y el existencialismo decimonónico."
+}
+
+// 5. Mary Shelley
+{
+  "name": "Mary Shelley",
+  "email": "shelley@universal.com",
+  "nationality": "Reino Unido",
+  "birthYear": 1797,
+  "bio": "Escritora y filósofa, pionera indiscutible de la ciencia ficción moderna."
+}
+
+// 6. George Orwell
+{
+  "name": "George Orwell",
+  "email": "orwell@universal.com",
+  "nationality": "Reino Unido",
+  "birthYear": 1903,
+  "bio": "Cronista de la cultura y la política, famoso por sus mordaces críticas al totalitarismo."
+}
+
+// 7. Franz Kafka
+{
+  "name": "Franz Kafka",
+  "email": "kafka@universal.com",
+  "nationality": "República Checa",
+  "birthYear": 1883,
+  "bio": "Escritor cuyas obras abordan el absurdo, la burocracia opresiva y la alienación."
+}
+
+// 8. Jorge Luis Borges
+{
+  "name": "Jorge Luis Borges",
+  "email": "borges@universal.com",
+  "nationality": "Argentina",
+  "birthYear": 1899,
+  "bio": "Figura clave de la literatura en español del siglo XX, conocido por sus cuentos filosóficos."
+}
+
+// 9. Jane Austen
+{
+  "name": "Jane Austen",
+  "email": "austen@universal.com",
+  "nationality": "Reino Unido",
+  "birthYear": 1775,
+  "bio": "Novelista británica cuyas obras critican con ironía la sociedad de clases de su época."
+}
+
+// 10. Julio Verne
+{
+  "name": "Julio Verne",
+  "email": "verne@universal.com",
+  "nationality": "Francia",
+  "birthYear": 1828,
+  "bio": "Cofundador de la ciencia ficción, famoso por sus visionarias novelas de aventuras."
+}
+
+// 11. Antoine de Saint-Exupéry
+{
+  "name": "Antoine de Saint-Exupéry",
+  "email": "exupery@universal.com",
+  "nationality": "Francia",
+  "birthYear": 1900,
+  "bio": "Aviador e ilustrador francés, creador de una de las obras más traducidas del mundo."
+}
+
+// 12. Virginia Woolf
+{
+  "name": "Virginia Woolf",
+  "email": "woolf@universal.com",
+  "nationality": "Reino Unido",
+  "birthYear": 1882,
+  "bio": "Figura destacada del modernismo literario vanguardista y del feminismo internacional."
+}
+
+// 13. Ernest Hemingway
+{
+  "name": "Ernest Hemingway",
+  "email": "hemingway@universal.com",
+  "nationality": "Estados Unidos",
+  "birthYear": 1899,
+  "bio": "Premio Nobel de Literatura 1954, caracterizado por su estilo directo y minimalista."
+}
+
+// 14. Oscar Wilde
+{
+  "name": "Oscar Wilde",
+  "email": "wilde@universal.com",
+  "nationality": "Irlanda",
+  "birthYear": 1854,
+  "bio": "Escritor y poeta conocido por su ingenio punzante, sus obras teatrales y su estética lírica."
+}
+
+// 15. J.R.R. Tolkien
+{
+  "name": "J.R.R. Tolkien",
+  "email": "tolkien@universal.com",
+  "nationality": "Reino Unido",
+  "birthYear": 1892,
+  "bio": "Filólogo y académico, considerado el padre de la alta fantasía épica moderna."
+}
+
+// 16. Homero
+{
+  "name": "Homero",
+  "email": "homero@universal.com",
+  "nationality": "Grecia",
+  "birthYear": -800,
+  "bio": "Antiguo poeta épico griego, pilar fundamental del canon literario occidental."
+}
+
+// 17. Agatha Christie
+{
+  "name": "Agatha Christie",
+  "email": "christie@universal.com",
+  "nationality": "Reino Unido",
+  "birthYear": 1890,
+  "bio": "La reina del misterio, creadora de los detectives Hércules Poirot y Miss Marple."
+}
+
+// 18. Dante Alighieri
+{
+  "name": "Dante Alighieri",
+  "email": "dante@universal.com",
+  "nationality": "Italia",
+  "birthYear": 1265,
+  "bio": "El 'Poeta Supremo', autor que consolidó la transición entre la Edad Media y el Renacimiento."
+}
+
+// 19. H.P. Lovecraft
+{
+  "name": "H.P. Lovecraft",
+  "email": "lovecraft@universal.com",
+  "nationality": "Estados Unidos",
+  "birthYear": 1890,
+  "bio": "Innovador del cuento de terror, creador de la corriente del horror cósmico."
+}
+
+// 20. Mario Vargas Llosa
+{
+  "name": "Mario Vargas Llosa",
+  "email": "vargasllosa@universal.com",
+  "nationality": "Perú",
+  "birthYear": 1936,
+  "bio": "Premio Nobel de Literatura 2010, uno de los más grandes novelistas del Boom Latinoamericano."
+}

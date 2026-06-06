@@ -1,0 +1,219 @@
+// 1. Libro para Miguel de Cervantes
+{
+  "title": "Don Quijote de la Mancha",
+  "description": "La historia del ingenioso hidalgo que perdió el juicio por leer libros de caballerías.",
+  "isbn": "978-8420412146",
+  "publishedYear": 1605,
+  "genre": "Novela",
+  "pages": 1056,
+  "authorId": "PON_AQUÍ_EL_ID_DEL_AUTOR_1"
+}
+
+// 2. Libro para William Shakespeare
+{
+  "title": "Hamlet",
+  "description": "Tragedia familiar y política donde el príncipe de Dinamarca busca vengar la muerte de su padre.",
+  "isbn": "978-0451526922",
+  "publishedYear": 1603,
+  "genre": "Tragedia",
+  "pages": 342,
+  "authorId": "PON_AQUÍ_EL_ID_DEL_AUTOR_2"
+}
+
+// 3. Libro para Edgar Allan Poe
+{
+  "title": "Los crímenes de la calle Morgue",
+  "description": "Considerado el primer relato de detectives de la historia literaria.",
+  "isbn": "978-1503222625",
+  "publishedYear": 1841,
+  "genre": "Misterio",
+  "pages": 96,
+  "authorId": "PON_AQUÍ_EL_ID_DEL_AUTOR_3"
+}
+
+// 4. Libro para Fyodor Dostoevsky
+{
+  "title": "Crimen y castigo",
+  "description": "Análisis psicológico de Rodión Raskólnikov tras cometer un asesinato por dilemas morales.",
+  "isbn": "978-0140449136",
+  "publishedYear": 1866,
+  "genre": "Novela",
+  "pages": 672,
+  "authorId": "PON_AQUÍ_EL_ID_DEL_AUTOR_4"
+}
+
+// 5. Libro para Mary Shelley
+{
+  "title": "Frankenstein o el moderno Prometeo",
+  "description": "Un científico desafía los límites de la naturaleza dando vida a una criatura hecha de cadáveres.",
+  "isbn": "978-0141439471",
+  "publishedYear": 1818,
+  "genre": "Ciencia Ficción",
+  "pages": 280,
+  "authorId": "PON_AQUÍ_EL_ID_DEL_AUTOR_5"
+}
+
+// 6. Libro para George Orwell
+{
+  "title": "1984",
+  "description": "Novela distópica sobre un régimen totalitario omnipresente liderado por el Gran Hermano.",
+  "isbn": "978-0451524935",
+  "publishedYear": 1949,
+  "genre": "Distopía",
+  "pages": 328,
+  "authorId": "PON_AQUÍ_EL_ID_DEL_AUTOR_6"
+}
+
+// 7. Libro para Franz Kafka
+{
+  "title": "La metamorfosis",
+  "description": "Gregorio Samsa se despierta una mañana transformado en un monstruoso insecto.",
+  "isbn": "978-1503252417",
+  "publishedYear": 1915,
+  "genre": "Ficción Absurda",
+  "pages": 96,
+  "authorId": "PON_AQUÍ_EL_ID_DEL_AUTOR_7"
+}
+
+// 8. Libro para Jorge Luis Borges
+{
+  "title": "Ficciones",
+  "description": "Antología de cuentos que juegan con laberintos, espejos, infinitos y bibliotecas irreales.",
+  "isbn": "978-0307950925",
+  "publishedYear": 1944,
+  "genre": "Fantasía Filosófica",
+  "pages": 224,
+  "authorId": "PON_AQUÍ_EL_ID_DEL_AUTOR_8"
+}
+
+// 9. Libro para Jane Austen
+{
+  "title": "Orgullo y prejuicio",
+  "description": "Una brillante comedia romántica clásica sobre las apariencias y las clases sociales.",
+  "isbn": "978-0141439518",
+  "publishedYear": 1813,
+  "genre": "Romance",
+  "pages": 432,
+  "authorId": "PON_AQUÍ_EL_ID_DEL_AUTOR_9"
+}
+
+// 10. Libro para Julio Verne
+{
+  "title": "Veinte mil leguas de viaje submarino",
+  "description": "Aventuras mar adentro a bordo del submarino Nautilus guiado por el Capitán Nemo.",
+  "isbn": "978-0140390629",
+  "publishedYear": 1870,
+  "genre": "Aventura",
+  "pages": 448,
+  "authorId": "PON_AQUÍ_EL_ID_DEL_AUTOR_10"
+}
+
+// 11. Libro para Antoine de Saint-Exupéry
+{
+  "title": "El principito",
+  "description": "Una fábula poética y filosófica que examina la vida de los adultos desde los ojos de un niño espacial.",
+  "isbn": "978-0156012195",
+  "publishedYear": 1432,
+  "genre": "Fábula",
+  "pages": 96,
+  "authorId": "PON_AQUÍ_EL_ID_DEL_AUTOR_11"
+}
+
+// 12. Libro para Virginia Woolf
+{
+  "title": "Al faro",
+  "description": "Obra cumbre del flujo de conciencia que retrata la vida de la familia Ramsay.",
+  "isbn": "978-0156907385",
+  "publishedYear": 1927,
+  "genre": "Modernismo",
+  "pages": 209,
+  "authorId": "PON_AQUÍ_EL_ID_DEL_AUTOR_12"
+}
+
+// 13. Libro para Ernest Hemingway
+{
+  "title": "El viejo y el mar",
+  "description": "La lucha heroica y solitaria de un viejo pescador cubano contra un enorme pez espada marlín.",
+  "isbn": "978-0684801223",
+  "publishedYear": 1952,
+  "genre": "Novela Corta",
+  "pages": 128,
+  "authorId": "PON_AQUÍ_EL_ID_DEL_AUTOR_13"
+}
+
+// 14. Libro para Oscar Wilde
+{
+  "title": "El retrato de Dorian Gray",
+  "description": "Un joven vende su alma para que su retrato envejezca y sufra los pecados en su lugar.",
+  "isbn": "978-0141439570",
+  "publishedYear": 1890,
+  "genre": "Gótico",
+  "pages": 304,
+  "authorId": "PON_AQUÍ_EL_ID_DEL_AUTOR_14"
+}
+
+// 15. Libro para J.R.R. Tolkien
+{
+  "title": "El Hobbit",
+  "description": "El tranquilo hobbit Bilbo Bolsón es arrastrado a una peligrosa aventura para recuperar un tesoro custodiado por un dragón.",
+  "isbn": "978-0345339683",
+  "publishedYear": 1937,
+  "genre": "Fantasía",
+  "pages": 310,
+  "authorId": "PON_AQUÍ_EL_ID_DEL_AUTOR_15"
+}
+
+// 16. Libro para Homero
+{
+  "title": "La Odisea",
+  "description": "El accidentado e increíble viaje de regreso a casa del héroe Odiseo tras la caída de Troya.",
+  "isbn": "978-0140268866",
+  "publishedYear": -750,
+  "genre": "Epopeya",
+  "pages": 544,
+  "authorId": "PON_AQUÍ_EL_ID_DEL_AUTOR_16"
+}
+
+// 17. Libro para Agatha Christie
+{
+  "title": "Asesinato en el Orient Express",
+  "description": "Un detective debe resolver un sangriento asesinato ocurrido a bordo de un tren varado en la nieve.",
+  "isbn": "978-0062073501",
+  "publishedYear": 1934,
+  "genre": "Policial",
+  "pages": 256,
+  "authorId": "PON_AQUÍ_EL_ID_DEL_AUTOR_17"
+}
+
+// 18. Libro para Dante Alighieri
+{
+  "title": "La Divina Comedia",
+  "description": "Un viaje teológico a través del Infierno, el Purgatorio y el Paraíso.",
+  "isbn": "978-0140448955",
+  "publishedYear": 1320,
+  "genre": "Poesía Épica",
+  "pages": 752,
+  "authorId": "PON_AQUÍ_EL_ID_DEL_AUTOR_18"
+}
+
+// 19. Libro para H.P. Lovecraft
+{
+  "title": "La llamada de Cthulhu",
+  "description": "Relato que establece el despertar de entidades alienígenas ancestrales ocultas en la Tierra.",
+  "isbn": "978-1515434115",
+  "publishedYear": 1928,
+  "genre": "Terror Cósmico",
+  "pages": 45,
+  "authorId": "PON_AQUÍ_EL_ID_DEL_AUTOR_19"
+}
+
+// 20. Libro para Mario Vargas Llosa
+{
+  "title": "La ciudad y los perros",
+  "description": "Novela que relata las duras vivencias de los jóvenes cadetes en el Colegio Militar Leoncio Prado.",
+  "isbn": "978-0307474742",
+  "publishedYear": 1963,
+  "genre": "Novela",
+  "pages": 464,
+  "authorId": "PON_AQUÍ_EL_ID_DEL_AUTOR_20"
+}
