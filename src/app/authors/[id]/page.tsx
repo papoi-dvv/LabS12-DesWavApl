@@ -28,7 +28,7 @@ export default async function Page({ params }: Props) {
         <div className="mx-auto grid max-w-5xl gap-6 px-6 py-8 md:grid-cols-[180px_1fr] md:items-end">
           <div className="overflow-hidden rounded-2xl bg-white/10 ring-1 ring-white/20">
             <div className="relative aspect-square">
-              <ImageWithFallback src={author.imageData || author.imageUrl || `/images/authors/${author.id}.jpg`} kind="author" alt={author.name} fill className="object-cover" sizes="180px" />
+              <ImageWithFallback src={author.imageData || author.imageUrl || null} kind="author" alt={author.name} fill className="object-cover" sizes="180px" />
             </div>
           </div>
           <div>

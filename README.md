@@ -82,3 +82,39 @@ Contribuir
 
 Más información
 - Consulta `Estilos.md`, los archivos bajo `src/components` y `src/app` para ver implementaciones y patrones usados.
+
+Notas rápidas y buenas prácticas
+- Reinicio del servidor: después de cambiar el esquema de Prisma ejecuta `npx prisma db push` y `npx prisma generate`, y reinicia el servidor de desarrollo para que cargue el nuevo cliente Prisma.
+- Payloads grandes: la API acepta cargas base64 pero hay un límite por seguridad (10MB). Para archivos grandes es mejor usar un flujo de subida a un almacenamiento (S3/Supabase Storage) y guardar la URL en la BD.
+- Evita guardar imágenes muy pesadas en la base de datos (`imageData` en base64). Prefiere `imageUrl` apuntando a un almacenamiento externo.
+
+Comandos útiles (resumen)
+```bash
+# instalar dependencias
+npm install
+
+# generar Prisma Client (obligatorio tras cambios en schema)
+npx prisma generate
+
+# aplicar esquema a la base (dev)
+npx prisma db push
+
+# ejecutar seed (usa prisma.config.ts -> prisma/seed.ts)
+npx prisma db seed
+
+# arrancar dev
+npm run dev
+```
+
+Variables de entorno principales
+- `DATABASE_URL` — URL de conexión a Postgres (runtime)
+- `DIRECT_URL` — (opcional) URL directa para migraciones/seed si usas pooler
+- `NEXT_PUBLIC_APP_URL` — URL base usada por Server Components para construir fetchs (ej. `http://localhost:3000`)
+- `PORT` — puerto (opcional)
+
+Imagenes y uploads
+- Locales: `public/images/books/` y `public/images/authors/` (placeholders incluidos).
+- Subidas: el frontend puede enviar `imageData` (data URL) o `imageUrl`. Si vas a trabajar con muchos o archivos grandes, configura un bucket y sube el archivo desde el cliente.
+
+Problemas frecuentes
+- Si Next.js muestra que no reconoce `export const config` en rutas `app/api`, quita ese export: la configuración de rutas en App Router debe usarse con las claves estáticas y/o mediante comprobaciones en runtime.

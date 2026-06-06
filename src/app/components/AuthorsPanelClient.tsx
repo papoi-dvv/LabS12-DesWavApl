@@ -154,7 +154,7 @@ export default function AuthorsPanelClient() {
             {authors.map(a => (
               <Card key={a.id} className="flex min-h-64 flex-col overflow-hidden p-0">
                 <div className="relative h-36 bg-gray-100">
-                  <ImageWithFallback src={a.imageData || a.imageUrl || `/images/authors/${a.id}.jpg`} kind="author" alt={a.name} fill className="object-cover" sizes="(min-width: 1024px) 33vw, 50vw" />
+                  <ImageWithFallback src={a.imageData || a.imageUrl || null} kind="author" alt={a.name} fill className="object-cover" sizes="(min-width: 1024px) 33vw, 50vw" />
                 </div>
                 <div className="flex flex-1 flex-col p-4">
                   <div className="flex items-start justify-between gap-3">

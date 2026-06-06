@@ -7,6 +7,7 @@ import Link from 'next/link'
 import ImageWithFallback from '@/components/ImageWithFallback'
 import Card from '@/components/ui/Card'
 import Skeleton from '@/components/ui/Skeleton'
+import BookEditClient from '@/app/books/[id]/components/BookEditClient'
 
 type Author = { id: string; name: string }
 
@@ -18,6 +19,8 @@ type Book = {
   publishedYear?: number
   pages?: number
   author?: { id: string; name: string }
+  imageUrl?: string | null
+  imageData?: string | null
 }
 
 export default function BooksManagerClient() {
@@ -35,7 +38,19 @@ export default function BooksManagerClient() {
   const [sortBy, setSortBy] = useState<'createdAt'|'title'|'publishedYear'>('createdAt')
   const [order, setOrder] = useState<'asc'|'desc'>('desc')
 
-  const [form, setForm] = useState({ title: '', isbn: '', genre: '', publishedYear: '', pages: '', authorId: '' })
+  const [form, setForm] = useState({ title: '', isbn: '', genre: '', publishedYear: '', pages: '', authorId: '', imageUrl: '', imageData: '' })
+  const [editingBook, setEditingBook] = useState<Book | null>(null)
+
+  function readImageFile(file?: File) {
+    if (!file) return
+    if (!file.type.startsWith('image/')) {
+      alert('Selecciona un archivo de imagen')
+      return
+    }
+    const reader = new FileReader()
+    reader.onload = () => setForm(current => ({ ...current, imageData: String(reader.result || '') }))
+    reader.readAsDataURL(file)
+  }
 
   async function fetchAuthors() {
     try {
@@ -97,6 +112,8 @@ export default function BooksManagerClient() {
       const payload = {
         title: form.title,
         isbn: form.isbn || undefined,
+        imageUrl: form.imageUrl || undefined,
+        imageData: form.imageData || undefined,
         genre: form.genre || undefined,
         publishedYear: form.publishedYear ? Number(form.publishedYear) : undefined,
         pages: form.pages ? Number(form.pages) : undefined,
@@ -104,7 +121,7 @@ export default function BooksManagerClient() {
       }
       const res = await fetch('/api/books', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
       if (res.ok) {
-        setForm({ title: '', isbn: '', genre: '', publishedYear: '', pages: '', authorId: '' })
+        setForm({ title: '', isbn: '', genre: '', publishedYear: '', pages: '', authorId: '', imageUrl: '', imageData: '' })
         await fetchBooks(1)
       } else {
         const err = await res.json()
@@ -136,9 +153,20 @@ export default function BooksManagerClient() {
           <input value={form.genre} onChange={(e) => setForm({...form, genre: e.target.value})} placeholder="Género" className="p-3" />
           <input value={form.publishedYear} onChange={(e) => setForm({...form, publishedYear: e.target.value})} placeholder="Año" className="p-3" />
           <input value={form.pages} onChange={(e) => setForm({...form, pages: e.target.value})} placeholder="Páginas" className="p-3" />
+          <input value={form.imageUrl} onChange={(e) => setForm({...form, imageUrl: e.target.value})} placeholder="URL de imagen (opcional)" className="p-3" />
+          <label className="flex cursor-pointer items-center justify-center rounded-xl border border-dashed border-gray-300 bg-gray-50 px-4 py-3 text-sm font-semibold text-gray-600 hover:border-amber-400 hover:bg-amber-50">
+            Cargar imagen
+            <input type="file" accept="image/*" onChange={(e) => readImageFile(e.target.files?.[0])} className="hidden" />
+          </label>
+          {(form.imageUrl || form.imageData) && (
+            <div className="mt-3 flex flex-wrap items-center gap-2 text-sm text-gray-600 md:col-span-3">
+              <span className="rounded-full bg-amber-50 px-3 py-1 font-medium text-amber-700">Imagen seleccionada</span>
+              <button type="button" onClick={() => setForm({ ...form, imageUrl: '', imageData: '' })} className="rounded-full border border-red-200 px-3 py-1 font-semibold text-red-600 hover:bg-red-50">Quitar imagen</button>
+            </div>
+          )}
           <div className="md:col-span-3 flex gap-2">
             <button className="rounded-full bg-amber-500 px-5 py-2.5 text-sm font-semibold text-white hover:bg-amber-600">Crear libro</button>
-            <button type="button" onClick={() => setForm({ title: '', isbn: '', genre: '', publishedYear: '', pages: '', authorId: '' })} className="rounded-full border border-gray-200 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50">Limpiar</button>
+            <button type="button" onClick={() => setForm({ title: '', isbn: '', genre: '', publishedYear: '', pages: '', authorId: '', imageUrl: '', imageData: '' })} className="rounded-full border border-gray-200 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50">Limpiar</button>
           </div>
         </form>
       </section>
@@ -185,7 +213,7 @@ export default function BooksManagerClient() {
             {books.map(b => (
               <Card key={b.id} className="flex min-h-80 flex-col overflow-hidden p-0">
                 <div className="relative h-44 bg-gray-100">
-                  <ImageWithFallback src={`/images/books/${b.id}.jpg`} kind="book" alt={b.title} fill className="object-cover" sizes="(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, 50vw" />
+                  <ImageWithFallback src={b.imageData || b.imageUrl || null} kind="book" alt={b.title} fill className="object-cover" sizes="(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, 50vw" />
                 </div>
                 <div className="flex flex-1 flex-col p-4">
                   <div className="truncate text-base font-semibold text-gray-800">{b.title}</div>
@@ -196,11 +224,25 @@ export default function BooksManagerClient() {
                   </div>
                   <div className="mt-auto flex flex-wrap gap-2 pt-4">
                     <Link href={`/books/${b.id}`} className="rounded-full bg-indigo-900 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-800">Ver</Link>
+                    <button onClick={() => setEditingBook(b)} className="rounded-full border border-amber-500 px-4 py-2 text-sm font-semibold text-amber-600 hover:bg-amber-50">Editar</button>
                     <button onClick={() => remove(b.id)} className="rounded-full border border-red-200 px-4 py-2 text-sm font-semibold text-red-600 hover:bg-red-50">Eliminar</button>
                   </div>
                 </div>
               </Card>
             ))}
+          </div>
+        )}
+
+        {editingBook && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center">
+            <div className="absolute inset-0 bg-black/40" onClick={()=>setEditingBook(null)} />
+            <div className="relative max-w-3xl w-full p-6">
+              <div className="rounded-2xl bg-white p-6 shadow-lg">
+                <h3 className="mb-4 text-lg font-semibold">Editar libro</h3>
+                {/* @ts-ignore */}
+                <BookEditClient initial={editingBook} onClose={()=>setEditingBook(null)} onSaved={async ()=>{ setEditingBook(null); await fetchBooks(1) }} />
+              </div>
+            </div>
           </div>
         )}
 

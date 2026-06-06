@@ -28,7 +28,7 @@ const prisma = new PrismaClient({
 interface BookData {
   title: string
   description: string
-  isbn: string
+  isbn?: string
   publishedYear: number
   genre: string
   pages: number
@@ -733,7 +733,8 @@ async function seed() {
       console.log(`   📚 Agregando ${authorData.books.length} libros...`)
 
       for (const bookData of authorData.books) {
-        try {
+        // Si hay ISBN, usamos upsert por unicidad; si no, creamos normalmente.
+        if (bookData.isbn) {
           await prisma.book.upsert({
             where: { isbn: bookData.isbn },
             update: {},
@@ -747,12 +748,17 @@ async function seed() {
               authorId: author.id,
             },
           })
-        } catch (bookError: any) {
-          if (bookError.code === 'P2002') {
-            console.log(`   ⚠️  Libro "${bookData.title}" ya existe (ISBN: ${bookData.isbn})`)
-          } else {
-            throw bookError
-          }
+        } else {
+          await prisma.book.create({
+            data: {
+              title: bookData.title,
+              description: bookData.description,
+              publishedYear: bookData.publishedYear,
+              genre: bookData.genre,
+              pages: bookData.pages,
+              authorId: author.id,
+            },
+          })
         }
       }
 

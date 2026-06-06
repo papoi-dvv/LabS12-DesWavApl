@@ -12,7 +12,9 @@ export default function Page() {
             Volver a autores
           </Link>
           <h1 className="text-4xl font-semibold">Catalogo de libros</h1>
-          <p className="mt-3 max-w-2xl text-indigo-100">Crea, filtra y revisa libros en una cuadricula lista para incorporar portadas desde <span className="font-semibold text-amber-200">public/images/books</span>.</p>
+          <p className="mt-3 max-w-2xl text-indigo-100">
+            Explora y administra la colección de libros disponibles. Filtra los resultados en tiempo real, accede al detalle de cada obra o actualiza la información del catálogo.
+          </p>
         </div>
       </section>
       <section className="mx-auto max-w-6xl px-6 py-8">

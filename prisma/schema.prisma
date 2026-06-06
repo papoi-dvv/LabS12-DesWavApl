@@ -29,6 +29,8 @@ model Book {
   id            String   @id @default(cuid())
   title         String
   description   String?
+  imageUrl      String?
+  imageData     String?
   isbn          String?  @unique
   publishedYear Int?
   genre         String?

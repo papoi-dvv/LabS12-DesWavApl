@@ -3,7 +3,8 @@ import BookEditClient from '@/app/books/[id]/components/BookEditClient'
 
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {
   const resolved = await params
-  const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || ''}/api/books/${resolved.id}`, { cache: 'no-store' })
+  const base = process.env.NEXT_PUBLIC_APP_URL || `http://localhost:${process.env.PORT || 3000}`
+  const res = await fetch(`${base}/api/books/${resolved.id}`, { cache: 'no-store' })
   if (!res.ok) throw new Error('Libro no encontrado')
   const book = await res.json()
 

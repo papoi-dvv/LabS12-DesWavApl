@@ -3,7 +3,13 @@ import { prisma } from '@/lib/prisma'
 
 export async function GET(request: Request) {
   try {
-    const { searchParams } = new URL(request.url)
+    let searchParams: URLSearchParams
+    try {
+      searchParams = new URL(request.url).searchParams
+    } catch {
+      const host = request.headers.get('host') ?? 'localhost:3000'
+      searchParams = new URL(request.url, `http://${host}`).searchParams
+    }
 
     const search = searchParams.get('search') ?? ''
     const genre = searchParams.get('genre') || undefined

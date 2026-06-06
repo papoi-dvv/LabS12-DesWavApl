@@ -4,7 +4,13 @@ import { prisma } from '@/lib/prisma'
 // GET - Obtener todos los libros
 export async function GET(request: Request) {
   try {
-    const { searchParams } = new URL(request.url)
+    let searchParams: URLSearchParams
+    try {
+      searchParams = new URL(request.url).searchParams
+    } catch {
+      const host = request.headers.get('host') ?? 'localhost:3000'
+      searchParams = new URL(request.url, `http://${host}`).searchParams
+    }
     const genre = searchParams.get('genre')
     const authorId = searchParams.get('authorId')
 
@@ -39,10 +45,17 @@ export async function GET(request: Request) {
 // POST - Crear un nuevo libro
 export async function POST(request: Request) {
   try {
+    // reject large payloads when Content-Length is provided
+    const cl = request.headers.get('content-length')
+    if (cl && Number(cl) > MAX_PAYLOAD_BYTES) {
+      return NextResponse.json({ error: 'Payload too large' }, { status: 413 })
+    }
     const body = await request.json()
     const {
       title,
       description,
+      imageUrl,
+      imageData,
       isbn,
       publishedYear,
       genre,
@@ -88,6 +101,8 @@ export async function POST(request: Request) {
       data: {
         title,
         description,
+        imageUrl: imageUrl || null,
+        imageData: imageData || null,
         isbn,
         publishedYear: publishedYear ? parseInt(publishedYear) : null,
         genre,
@@ -114,3 +129,6 @@ export async function POST(request: Request) {
     )
   }
 }
+
+// Enforce a max payload size via Content-Length header when available
+const MAX_PAYLOAD_BYTES = 10 * 1024 * 1024 // 10MB
