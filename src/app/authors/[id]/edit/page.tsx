@@ -8,9 +8,16 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
   const data = await res.json()
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-semibold mb-4">Editar autor</h1>
-      <AuthorEditClient initial={data} />
-    </div>
+    <main className="min-h-screen bg-gray-100">
+      <section className="bg-indigo-900 text-white">
+        <div className="mx-auto max-w-3xl px-6 py-8">
+          <h1 className="text-4xl font-semibold">Editar autor</h1>
+          <p className="mt-3 text-indigo-100">{data.name}</p>
+        </div>
+      </section>
+      <section className="mx-auto max-w-3xl px-6 py-8">
+        <AuthorEditClient initial={data} inline />
+      </section>
+    </main>
   )
 }

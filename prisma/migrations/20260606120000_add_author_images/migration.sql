@@ -1,0 +1,2 @@
+ALTER TABLE "Author" ADD COLUMN "imageUrl" TEXT;
+ALTER TABLE "Author" ADD COLUMN "imageData" TEXT;

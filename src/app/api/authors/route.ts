@@ -30,7 +30,7 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { name, email, bio, nationality, birthYear } = body
+    const { name, email, bio, imageUrl, imageData, nationality, birthYear } = body
 
     // Validación básica
     if (!name || !email) {
@@ -54,6 +54,8 @@ export async function POST(request: Request) {
         name,
         email,
         bio,
+        imageUrl: imageUrl || null,
+        imageData: imageData || null,
         nationality,
         birthYear: birthYear ? parseInt(birthYear) : null,
       },

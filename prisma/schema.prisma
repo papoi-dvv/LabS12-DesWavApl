@@ -16,6 +16,8 @@ model Author {
   name        String
   email       String   @unique
   bio         String?
+  imageUrl    String?
+  imageData   String?
   nationality String?
   birthYear   Int?
   books       Book[]

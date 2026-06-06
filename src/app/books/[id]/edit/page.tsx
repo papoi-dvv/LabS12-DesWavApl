@@ -8,9 +8,18 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
   const book = await res.json()
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-semibold mb-4">Editar libro</h1>
-      <BookEditClient initial={book} />
-    </div>
+    <main className="min-h-screen bg-gray-100">
+      <section className="bg-indigo-900 text-white">
+        <div className="mx-auto max-w-3xl px-6 py-8">
+          <h1 className="text-4xl font-semibold">Editar libro</h1>
+          <p className="mt-3 text-indigo-100">{book.title}</p>
+        </div>
+      </section>
+      <section className="mx-auto max-w-3xl px-6 py-8">
+        <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-100">
+          <BookEditClient initial={book} />
+        </div>
+      </section>
+    </main>
   )
 }

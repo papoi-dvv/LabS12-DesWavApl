@@ -1,6 +1,12 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+/* eslint-disable react-hooks/set-state-in-effect */
+
+import React, { useCallback, useEffect, useState } from 'react'
+import Link from 'next/link'
+import ImageWithFallback from '@/components/ImageWithFallback'
+import Card from '@/components/ui/Card'
+import Skeleton from '@/components/ui/Skeleton'
 
 type Author = { id: string; name: string }
 
@@ -17,35 +23,36 @@ type Book = {
 export default function BooksManagerClient() {
   const [authors, setAuthors] = useState<Author[]>([])
   const [books, setBooks] = useState<Book[]>([])
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [search, setSearch] = useState('')
   const [genre, setGenre] = useState('')
   const [authorId, setAuthorId] = useState('')
   const [page, setPage] = useState(1)
   const [limit] = useState(10)
   const [total, setTotal] = useState(0)
+  const [totalPages, setTotalPages] = useState(1)
   const [sortBy, setSortBy] = useState<'createdAt'|'title'|'publishedYear'>('createdAt')
   const [order, setOrder] = useState<'asc'|'desc'>('desc')
 
   const [form, setForm] = useState({ title: '', isbn: '', genre: '', publishedYear: '', pages: '', authorId: '' })
 
-  useEffect(() => { fetchAuthors(); fetchBooks() }, [])
-
   async function fetchAuthors() {
     try {
       const res = await fetch('/api/authors')
       const data = await res.json()
-      setAuthors(data)
-    } catch (e) { console.error(e) }
+      setAuthors(Array.isArray(data) ? data : [])
+    } catch (e) { console.error(e); setAuthors([]) }
   }
 
-  async function fetchBooks(p = page) {
+  const fetchBooks = useCallback(async (p = page) => {
     setLoading(true)
     try {
       const params = new URLSearchParams()
       if (search) params.set('search', search)
       if (genre) params.set('genre', genre)
-      if (authorId) params.set('authorId', authorId)
+      const selectedAuthor = authors.find(author => author.id === authorId)
+      if (selectedAuthor) params.set('authorName', selectedAuthor.name)
       params.set('page', String(p))
       params.set('limit', String(limit))
       params.set('sortBy', sortBy)
@@ -53,11 +60,36 @@ export default function BooksManagerClient() {
 
       const res = await fetch(`/api/books/search?${params.toString()}`)
       const json = await res.json()
+      if (!res.ok || !Array.isArray(json.data) || !json.pagination) {
+        setBooks([])
+        setTotal(0)
+        setPage(1)
+        setTotalPages(1)
+        setError(json?.error || 'No se pudieron cargar los libros')
+        return
+      }
       setBooks(json.data)
-      setTotal(json.pagination.total)
-      setPage(json.pagination.page)
-    } catch (e) { console.error(e) } finally { setLoading(false) }
-  }
+      setTotal(json.pagination.total ?? 0)
+      setPage(json.pagination.page ?? 1)
+      setTotalPages(json.pagination.totalPages ?? 1)
+      setError(null)
+    } catch (e) {
+      console.error(e)
+      setBooks([])
+      setTotal(0)
+      setPage(1)
+      setTotalPages(1)
+      setError('No se pudieron cargar los libros')
+    } finally { setLoading(false) }
+  }, [authors, authorId, genre, limit, order, page, search, sortBy])
+
+  useEffect(() => {
+    void fetchAuthors()
+  }, [])
+
+  useEffect(() => {
+    void fetchBooks()
+  }, [fetchBooks])
 
   async function submit(e: React.FormEvent) {
     e.preventDefault()
@@ -89,63 +121,93 @@ export default function BooksManagerClient() {
 
   return (
     <div className="space-y-6">
-      <section className="p-4 bg-white border rounded">
+      <section className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-gray-100">
+        <div className="mb-4">
+          <h2 className="text-2xl font-semibold text-gray-800">Crear libro</h2>
+          <p className="mt-1 text-sm text-gray-600">Registra un titulo y asocialo a un autor existente.</p>
+        </div>
         <form onSubmit={submit} className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          <input required value={form.title} onChange={(e) => setForm({...form, title: e.target.value})} placeholder="Título" className="border p-2 rounded" />
-          <select required value={form.authorId} onChange={(e) => setForm({...form, authorId: e.target.value})} className="border p-2 rounded">
+          <input required value={form.title} onChange={(e) => setForm({...form, title: e.target.value})} placeholder="Título" className="p-3" />
+          <select required value={form.authorId} onChange={(e) => setForm({...form, authorId: e.target.value})} className="p-3">
             <option value="">Seleccionar autor</option>
             {authors.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
           </select>
-          <input value={form.isbn} onChange={(e) => setForm({...form, isbn: e.target.value})} placeholder="ISBN" className="border p-2 rounded" />
-          <input value={form.genre} onChange={(e) => setForm({...form, genre: e.target.value})} placeholder="Género" className="border p-2 rounded" />
-          <input value={form.publishedYear} onChange={(e) => setForm({...form, publishedYear: e.target.value})} placeholder="Año" className="border p-2 rounded" />
-          <input value={form.pages} onChange={(e) => setForm({...form, pages: e.target.value})} placeholder="Páginas" className="border p-2 rounded" />
+          <input value={form.isbn} onChange={(e) => setForm({...form, isbn: e.target.value})} placeholder="ISBN" className="p-3" />
+          <input value={form.genre} onChange={(e) => setForm({...form, genre: e.target.value})} placeholder="Género" className="p-3" />
+          <input value={form.publishedYear} onChange={(e) => setForm({...form, publishedYear: e.target.value})} placeholder="Año" className="p-3" />
+          <input value={form.pages} onChange={(e) => setForm({...form, pages: e.target.value})} placeholder="Páginas" className="p-3" />
           <div className="md:col-span-3 flex gap-2">
-            <button className="px-4 py-2 bg-green-600 text-white rounded">Crear libro</button>
-            <button type="button" onClick={() => setForm({ title: '', isbn: '', genre: '', publishedYear: '', pages: '', authorId: '' })} className="px-4 py-2 bg-gray-200 rounded">Limpiar</button>
+            <button className="rounded-full bg-amber-500 px-5 py-2.5 text-sm font-semibold text-white hover:bg-amber-600">Crear libro</button>
+            <button type="button" onClick={() => setForm({ title: '', isbn: '', genre: '', publishedYear: '', pages: '', authorId: '' })} className="rounded-full border border-gray-200 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50">Limpiar</button>
           </div>
         </form>
       </section>
 
-      <section className="p-4 bg-white border rounded">
-        <div className="flex gap-2 mb-3">
-          <input placeholder="Buscar título..." value={search} onChange={(e)=> setSearch(e.target.value)} className="border p-2 rounded flex-1" />
-          <input placeholder="Género" value={genre} onChange={(e)=> setGenre(e.target.value)} className="border p-2 rounded w-48" />
-          <select value={sortBy} onChange={(e)=> setSortBy(e.target.value as any)} className="border p-2 rounded">
+      <section className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-gray-100">
+        <div className="mb-4 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+          <div>
+            <h2 className="text-2xl font-semibold text-gray-800">Libros</h2>
+            <p className="mt-1 text-sm text-gray-600">Resultados totales: {total}</p>
+          </div>
+        </div>
+        {error && (
+          <div className="mb-4 rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+            {error}
+          </div>
+        )}
+        <div className="mb-5 grid gap-3 md:grid-cols-[1fr_160px_190px_140px_110px_auto]">
+          <input placeholder="Buscar título..." value={search} onChange={(e)=> setSearch(e.target.value)} className="p-3" />
+          <input placeholder="Género" value={genre} onChange={(e)=> setGenre(e.target.value)} className="p-3" />
+          <select value={authorId} onChange={(e)=> setAuthorId(e.target.value)} className="p-3">
+            <option value="">Todos los autores</option>
+            {authors.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
+          </select>
+          <select value={sortBy} onChange={(e)=> setSortBy(e.target.value as 'createdAt' | 'title' | 'publishedYear')} className="p-3">
             <option value="createdAt">Creación</option>
             <option value="title">Título</option>
             <option value="publishedYear">Año</option>
           </select>
-          <select value={order} onChange={(e)=> setOrder(e.target.value as any)} className="border p-2 rounded">
+          <select value={order} onChange={(e)=> setOrder(e.target.value as 'asc' | 'desc')} className="p-3">
             <option value="desc">Desc</option>
             <option value="asc">Asc</option>
           </select>
-          <button onClick={()=>fetchBooks(1)} className="px-3 py-2 bg-blue-600 text-white rounded">Buscar</button>
+          <button onClick={()=>fetchBooks(1)} className="rounded-full bg-amber-500 px-5 py-2.5 text-sm font-semibold text-white hover:bg-amber-600">Buscar</button>
         </div>
 
-        <div className="text-sm text-gray-600 mb-2">Resultados totales: {total}</div>
-
-        {loading ? <div>Cargando...</div> : (
-          <div className="grid gap-3">
+        {loading ? (
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {Array.from({ length: 8 }).map((_, index) => (
+              <Skeleton key={index} className="h-80" />
+            ))}
+          </div>
+        ) : (
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {books.map(b => (
-              <div key={b.id} className="p-3 bg-white border rounded flex items-center justify-between">
-                <div>
-                  <div className="font-medium">{b.title}</div>
-                  <div className="text-sm text-gray-600">{b.author?.name} • {b.genre} • {b.publishedYear}</div>
+              <Card key={b.id} className="flex min-h-80 flex-col overflow-hidden p-0">
+                <div className="relative h-44 bg-gray-100">
+                  <ImageWithFallback src={`/images/books/${b.id}.jpg`} kind="book" alt={b.title} fill className="object-cover" sizes="(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, 50vw" />
                 </div>
-                <div className="flex gap-2">
-                  <a href={`/books/${b.id}`} className="px-3 py-1 bg-indigo-600 text-white rounded">Ver</a>
-                  <button onClick={() => remove(b.id)} className="px-3 py-1 bg-red-500 text-white rounded">Eliminar</button>
+                <div className="flex flex-1 flex-col p-4">
+                  <div className="truncate text-base font-semibold text-gray-800">{b.title}</div>
+                  <div className="mt-1 truncate text-sm text-gray-600">{b.author?.name || 'Autor pendiente'}</div>
+                  <div className="mt-3 flex flex-wrap gap-2 text-xs font-medium">
+                    <span className="rounded-full bg-gray-100 px-3 py-1 text-gray-700">{b.genre || 'Sin genero'}</span>
+                    <span className="rounded-full bg-amber-50 px-3 py-1 text-amber-700">{b.publishedYear || 'Sin año'}</span>
+                  </div>
+                  <div className="mt-auto flex flex-wrap gap-2 pt-4">
+                    <Link href={`/books/${b.id}`} className="rounded-full bg-indigo-900 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-800">Ver</Link>
+                    <button onClick={() => remove(b.id)} className="rounded-full border border-red-200 px-4 py-2 text-sm font-semibold text-red-600 hover:bg-red-50">Eliminar</button>
+                  </div>
                 </div>
-              </div>
+              </Card>
             ))}
           </div>
         )}
 
-        <div className="mt-4 flex items-center gap-2">
-          <button onClick={() => fetchBooks(Math.max(1, page-1))} className="px-3 py-1 bg-gray-200 rounded">Anterior</button>
-          <div>Página {page}</div>
-          <button onClick={() => fetchBooks(page+1)} className="px-3 py-1 bg-gray-200 rounded">Siguiente</button>
+        <div className="mt-5 flex items-center justify-center gap-3">
+          <button disabled={page <= 1} onClick={() => fetchBooks(Math.max(1, page-1))} className="rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-50">Anterior</button>
+          <div className="rounded-full bg-amber-500 px-4 py-2 text-sm font-semibold text-white">Página {page} de {totalPages}</div>
+          <button disabled={page >= totalPages} onClick={() => fetchBooks(page+1)} className="rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-50">Siguiente</button>
         </div>
 
       </section>

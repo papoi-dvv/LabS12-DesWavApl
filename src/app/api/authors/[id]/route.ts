@@ -48,7 +48,7 @@ export async function PUT(
   try {
     const resolvedParams = await params // Metemos el await
     const body = await request.json()
-    const { name, email, bio, nationality, birthYear } = body
+    const { name, email, bio, imageUrl, imageData, nationality, birthYear } = body
 
     if (email) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -66,6 +66,8 @@ export async function PUT(
         name,
         email,
         bio,
+        imageUrl: imageUrl || null,
+        imageData: imageData || null,
         nationality,
         birthYear: birthYear ? parseInt(birthYear) : null,
       },

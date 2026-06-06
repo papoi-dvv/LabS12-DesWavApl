@@ -1,8 +1,10 @@
 import React from 'react'
 
-export default function Card({ children, className = '' }: any) {
+type CardProps = React.HTMLAttributes<HTMLDivElement>
+
+export default function Card({ children, className = '', ...props }: CardProps) {
   return (
-    <div className={`bg-white rounded-xl shadow-sm hover:shadow-lg hover:-translate-y-1 transition p-4 ${className}`}>
+    <div className={`rounded-2xl bg-white p-4 shadow-sm ring-1 ring-gray-100 transition hover:-translate-y-1 hover:shadow-lg ${className}`} {...props}>
       {children}
     </div>
   )
