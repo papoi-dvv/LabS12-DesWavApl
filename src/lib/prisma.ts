@@ -2,8 +2,8 @@ import { PrismaClient } from '@prisma/client'
 import { Pool } from 'pg'
 import { PrismaPg } from '@prisma/adapter-pg'
 
-// Instanciamos el Pool de conexiones usando DIRECT_URL si está disponible, si no DATABASE_URL
-const connectionString = process.env.DIRECT_URL || process.env.DATABASE_URL || ''
+// En runtime la app debe usar DATABASE_URL; DIRECT_URL queda como respaldo local.
+const connectionString = process.env.DATABASE_URL || process.env.DIRECT_URL || ''
 if (!connectionString) {
   throw new Error('DATABASE_URL or DIRECT_URL must be set in the environment')
 }
@@ -16,7 +16,6 @@ const pool = new Pool({ connectionString, // small timeouts to fail fast in dev
 pool.on('error', (err) => {
   // Log pool-level errors to make diagnosis easier in dev
   // (node-postgres emits errors on idle clients)
-  // eslint-disable-next-line no-console
   console.error('Postgres pool error:', err)
 })
 

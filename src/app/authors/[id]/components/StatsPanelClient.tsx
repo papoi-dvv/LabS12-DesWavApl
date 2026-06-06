@@ -6,12 +6,12 @@ type Stats = {
   authorId: string
   authorName: string
   totalBooks: number
-  firstBook: { title: string; year: number } | null
-  latestBook: { title: string; year: number } | null
+  firstBook: { title: string; year: number | null } | null
+  latestBook: { title: string; year: number | null } | null
   averagePages: number
   genres: string[]
-  longestBook: { title: string; pages: number } | null
-  shortestBook: { title: string; pages: number } | null
+  longestBook: { title: string; pages: number | null } | null
+  shortestBook: { title: string; pages: number | null } | null
 }
 
 export default function StatsPanelClient({ authorId, initial }: { authorId?: string; initial?: Stats }) {

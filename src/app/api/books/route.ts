@@ -4,13 +4,7 @@ import { prisma } from '@/lib/prisma'
 // GET - Obtener todos los libros
 export async function GET(request: Request) {
   try {
-    let searchParams: URLSearchParams
-    try {
-      searchParams = new URL(request.url).searchParams
-    } catch {
-      const host = request.headers.get('host') ?? 'localhost:3000'
-      searchParams = new URL(request.url, `http://${host}`).searchParams
-    }
+    const searchParams = new URL(request.url).searchParams
     const genre = searchParams.get('genre')
     const authorId = searchParams.get('authorId')
 

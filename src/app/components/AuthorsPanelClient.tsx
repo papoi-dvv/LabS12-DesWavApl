@@ -12,9 +12,9 @@ type Author = {
   id: string
   name: string
   email: string
-  nationality?: string
-  birthYear?: number
-  bio?: string
+  nationality?: string | null
+  birthYear?: number | null
+  bio?: string | null
   imageUrl?: string | null
   imageData?: string | null
   books?: { id: string }[]
@@ -99,7 +99,12 @@ export default function AuthorsPanelClient({ initial }: { initial?: Author[] }) 
   function startEdit(a: Author) {
     setEditingId(a.id)
     setForm({ name: a.name, email: a.email, nationality: a.nationality || '', birthYear: a.birthYear ? String(a.birthYear) : '', imageUrl: a.imageUrl || '', imageData: a.imageData || '' })
-    setShowForm(true)
+    setShowForm(false)
+  }
+
+  function closeEditModal() {
+    setEditingId(null)
+    setForm(emptyForm)
   }
 
   return (
@@ -109,14 +114,14 @@ export default function AuthorsPanelClient({ initial }: { initial?: Author[] }) 
           <h2 className="text-2xl font-semibold text-gray-800">Autores</h2>
           <p className="mt-1 text-sm text-gray-600">Gestiona autores, nacionalidades y sus libros asociados.</p>
         </div>
-        <button onClick={() => { setShowForm(s => !s); setEditingId(null); setForm(emptyForm) }} className="inline-flex items-center justify-center rounded-full bg-amber-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-amber-600">
+        <button onClick={() => { setShowForm(s => !s); setEditingId(null); setForm(emptyForm) }} className="inline-flex items-center justify-center rounded-full bg-amber-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-amber-600">
           {showForm ? 'Cerrar formulario' : 'Crear autor'}
         </button>
       </div>
 
       {showForm && (
-        <form onSubmit={submit} className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-gray-100">
-          <h3 className="mb-4 text-base font-semibold text-gray-800">{editingId ? 'Editar autor' : 'Nuevo autor'}</h3>
+        <form onSubmit={submit} className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-gray-100 transition-all duration-200">
+          <h3 className="mb-4 text-base font-semibold text-gray-800">Nuevo autor</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <input required value={form.name} onChange={(e) => setForm({...form, name: e.target.value})} placeholder="Nombre" className="p-3" />
             <input required value={form.email} onChange={(e) => setForm({...form, email: e.target.value})} placeholder="Email" className="p-3" />
@@ -135,8 +140,8 @@ export default function AuthorsPanelClient({ initial }: { initial?: Author[] }) 
             </div>
           )}
           <div className="mt-3 flex gap-2">
-            <button type="submit" className="rounded-full bg-amber-500 px-5 py-2.5 text-sm font-semibold text-white hover:bg-amber-600">{editingId ? 'Guardar cambios' : 'Crear'}</button>
-            <button type="button" onClick={() => { setShowForm(false); setEditingId(null) }} className="rounded-full border border-gray-200 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50">Cancelar</button>
+            <button type="submit" className="rounded-full bg-amber-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-amber-600">Crear</button>
+            <button type="button" onClick={() => { setShowForm(false); setEditingId(null); setForm(emptyForm) }} className="rounded-full border border-gray-200 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-50">Cancelar</button>
           </div>
         </form>
       )}
@@ -181,6 +186,43 @@ export default function AuthorsPanelClient({ initial }: { initial?: Author[] }) 
           </div>
         )}
       </div>
+
+      {editingId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm transition-opacity duration-200">
+          <button className="absolute inset-0 cursor-default" aria-label="Cerrar modal de edición" onClick={closeEditModal} />
+          <div className="relative w-full max-w-2xl">
+            <form onSubmit={submit} className="max-h-[88vh] overflow-y-auto rounded-2xl bg-white p-5 shadow-2xl ring-1 ring-white/30 md:p-6">
+              <div className="mb-4 flex items-center justify-between gap-4">
+                <h3 className="text-lg font-semibold text-gray-800">Editar autor</h3>
+                <button type="button" onClick={closeEditModal} className="flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 text-xl leading-none text-gray-600 transition hover:bg-gray-50" aria-label="Cerrar">
+                  ×
+                </button>
+              </div>
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                <input required value={form.name} onChange={(e) => setForm({...form, name: e.target.value})} placeholder="Nombre" className="p-3" />
+                <input required value={form.email} onChange={(e) => setForm({...form, email: e.target.value})} placeholder="Email" className="p-3" />
+                <input value={form.nationality} onChange={(e) => setForm({...form, nationality: e.target.value})} placeholder="Nacionalidad" className="p-3" />
+                <input value={form.birthYear} onChange={(e) => setForm({...form, birthYear: e.target.value})} placeholder="Año de nacimiento" className="p-3" />
+                <input value={form.imageUrl} onChange={(e) => setForm({...form, imageUrl: e.target.value, imageData: form.imageData})} placeholder="URL de imagen opcional" className="p-3 md:col-span-2" />
+                <label className="flex cursor-pointer items-center justify-center rounded-xl border border-dashed border-gray-300 bg-gray-50 px-4 py-3 text-sm font-semibold text-gray-600 transition hover:border-amber-400 hover:bg-amber-50 md:col-span-2">
+                  Cargar imagen
+                  <input type="file" accept="image/*" onChange={(e) => readImageFile(e.target.files?.[0])} className="hidden" />
+                </label>
+              </div>
+              {(form.imageUrl || form.imageData) && (
+                <div className="mt-3 flex flex-wrap items-center gap-2 text-sm text-gray-600">
+                  <span className="rounded-full bg-amber-50 px-3 py-1 font-medium text-amber-700">Imagen seleccionada</span>
+                  <button type="button" onClick={() => setForm({ ...form, imageUrl: '', imageData: '' })} className="rounded-full border border-red-200 px-3 py-1 font-semibold text-red-600 transition hover:bg-red-50">Quitar imagen</button>
+                </div>
+              )}
+              <div className="mt-4 flex flex-wrap gap-2">
+                <button type="submit" className="rounded-full bg-amber-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-amber-600">Guardar cambios</button>
+                <button type="button" onClick={closeEditModal} className="rounded-full border border-gray-200 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-50">Cancelar</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </section>
   )
 }

@@ -10,10 +10,12 @@ type EditableBook = {
   genre?: string | null
   publishedYear?: number | string | null
   pages?: number | string | null
+  imageUrl?: string | null
+  imageData?: string | null
 }
 
-export default function BookEditClient({ initial, onClose, onSaved }: { initial: EditableBook; onClose?: () => void; onSaved?: (b: any) => void }) {
-  const [form, setForm] = useState({ title: initial.title || '', description: initial.description || '', isbn: initial.isbn || '', genre: initial.genre || '', publishedYear: initial.publishedYear || '', pages: initial.pages || '', imageUrl: (initial as any).imageUrl || '', imageData: (initial as any).imageData || '' })
+export default function BookEditClient({ initial, onClose, onSaved }: { initial: EditableBook; onClose?: () => void; onSaved?: (book: EditableBook | null) => void }) {
+  const [form, setForm] = useState({ title: initial.title || '', description: initial.description || '', isbn: initial.isbn || '', genre: initial.genre || '', publishedYear: initial.publishedYear || '', pages: initial.pages || '', imageUrl: initial.imageUrl || '', imageData: initial.imageData || '' })
 
   function readImageFile(file?: File) {
     if (!file) return

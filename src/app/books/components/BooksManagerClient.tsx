@@ -14,10 +14,10 @@ type Author = { id: string; name: string }
 type Book = {
   id: string
   title: string
-  isbn?: string
-  genre?: string
-  publishedYear?: number
-  pages?: number
+  isbn?: string | null
+  genre?: string | null
+  publishedYear?: number | null
+  pages?: number | null
   author?: { id: string; name: string }
   imageUrl?: string | null
   imageData?: string | null
@@ -32,13 +32,14 @@ export default function BooksManagerClient({ initialAuthors, initialBooks, initi
   const [genre, setGenre] = useState('')
   const [authorId, setAuthorId] = useState('')
   const [page, setPage] = useState(1)
-  const [limit] = useState(10)
+  const [limit] = useState(12)
   const [total, setTotal] = useState(0)
   const [totalPages, setTotalPages] = useState(1)
   const [sortBy, setSortBy] = useState<'createdAt'|'title'|'publishedYear'>('createdAt')
   const [order, setOrder] = useState<'asc'|'desc'>('desc')
 
   const [form, setForm] = useState({ title: '', isbn: '', genre: '', publishedYear: '', pages: '', authorId: '', imageUrl: '', imageData: '' })
+  const [showCreateForm, setShowCreateForm] = useState(false)
   const [editingBook, setEditingBook] = useState<Book | null>(null)
 
   function readImageFile(file?: File) {
@@ -107,18 +108,20 @@ export default function BooksManagerClient({ initialAuthors, initialBooks, initi
   }, [initialAuthors])
 
   useEffect(() => {
-    if (initialBooks && Array.isArray(initialBooks)) {
-      setBooks(initialBooks)
-      if (initialPagination) {
-        setTotal(initialPagination.total ?? 0)
-        setPage(initialPagination.page ?? 1)
-        setTotalPages(initialPagination.totalPages ?? 1)
-      }
-      setLoading(false)
-      return
+    if (!initialBooks || !Array.isArray(initialBooks)) return
+    setBooks(initialBooks)
+    if (initialPagination) {
+      setTotal(initialPagination.total ?? 0)
+      setPage(initialPagination.page ?? 1)
+      setTotalPages(initialPagination.totalPages ?? 1)
     }
+    setLoading(false)
+  }, [initialBooks, initialPagination])
+
+  useEffect(() => {
+    if (initialBooks && Array.isArray(initialBooks)) return
     void fetchBooks()
-  }, [fetchBooks])
+  }, [fetchBooks, initialBooks])
 
   async function submit(e: React.FormEvent) {
     e.preventDefault()
@@ -136,6 +139,7 @@ export default function BooksManagerClient({ initialAuthors, initialBooks, initi
       const res = await fetch('/api/books', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
       if (res.ok) {
         setForm({ title: '', isbn: '', genre: '', publishedYear: '', pages: '', authorId: '', imageUrl: '', imageData: '' })
+        setShowCreateForm(false)
         await fetchBooks(1)
       } else {
         const err = await res.json()
@@ -153,36 +157,47 @@ export default function BooksManagerClient({ initialAuthors, initialBooks, initi
   return (
     <div className="space-y-6">
       <section className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-gray-100">
-        <div className="mb-4">
-          <h2 className="text-2xl font-semibold text-gray-800">Crear libro</h2>
-          <p className="mt-1 text-sm text-gray-600">Registra un titulo y asocialo a un autor existente.</p>
-        </div>
-        <form onSubmit={submit} className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          <input required value={form.title} onChange={(e) => setForm({...form, title: e.target.value})} placeholder="Título" className="p-3" />
-          <select required value={form.authorId} onChange={(e) => setForm({...form, authorId: e.target.value})} className="p-3">
-            <option value="">Seleccionar autor</option>
-            {authors.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
-          </select>
-          <input value={form.isbn} onChange={(e) => setForm({...form, isbn: e.target.value})} placeholder="ISBN" className="p-3" />
-          <input value={form.genre} onChange={(e) => setForm({...form, genre: e.target.value})} placeholder="Género" className="p-3" />
-          <input value={form.publishedYear} onChange={(e) => setForm({...form, publishedYear: e.target.value})} placeholder="Año" className="p-3" />
-          <input value={form.pages} onChange={(e) => setForm({...form, pages: e.target.value})} placeholder="Páginas" className="p-3" />
-          <input value={form.imageUrl} onChange={(e) => setForm({...form, imageUrl: e.target.value})} placeholder="URL de imagen (opcional)" className="p-3" />
-          <label className="flex cursor-pointer items-center justify-center rounded-xl border border-dashed border-gray-300 bg-gray-50 px-4 py-3 text-sm font-semibold text-gray-600 hover:border-amber-400 hover:bg-amber-50">
-            Cargar imagen
-            <input type="file" accept="image/*" onChange={(e) => readImageFile(e.target.files?.[0])} className="hidden" />
-          </label>
-          {(form.imageUrl || form.imageData) && (
-            <div className="mt-3 flex flex-wrap items-center gap-2 text-sm text-gray-600 md:col-span-3">
-              <span className="rounded-full bg-amber-50 px-3 py-1 font-medium text-amber-700">Imagen seleccionada</span>
-              <button type="button" onClick={() => setForm({ ...form, imageUrl: '', imageData: '' })} className="rounded-full border border-red-200 px-3 py-1 font-semibold text-red-600 hover:bg-red-50">Quitar imagen</button>
-            </div>
-          )}
-          <div className="md:col-span-3 flex gap-2">
-            <button className="rounded-full bg-amber-500 px-5 py-2.5 text-sm font-semibold text-white hover:bg-amber-600">Crear libro</button>
-            <button type="button" onClick={() => setForm({ title: '', isbn: '', genre: '', publishedYear: '', pages: '', authorId: '', imageUrl: '', imageData: '' })} className="rounded-full border border-gray-200 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50">Limpiar</button>
+        <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+          <div>
+            <h2 className="text-2xl font-semibold text-gray-800">Crear libro</h2>
+            <p className="mt-1 text-sm text-gray-600">Registra un titulo y asocialo a un autor existente.</p>
           </div>
-        </form>
+          <button
+            type="button"
+            onClick={() => setShowCreateForm(isOpen => !isOpen)}
+            className="inline-flex items-center justify-center rounded-full bg-amber-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-amber-600"
+          >
+            {showCreateForm ? 'Cerrar formulario' : 'Crear libro'}
+          </button>
+        </div>
+        {showCreateForm && (
+          <form onSubmit={submit} className="mt-5 grid grid-cols-1 gap-3 transition-all duration-200 md:grid-cols-3">
+            <input required value={form.title} onChange={(e) => setForm({...form, title: e.target.value})} placeholder="Título" className="p-3" />
+            <select required value={form.authorId} onChange={(e) => setForm({...form, authorId: e.target.value})} className="p-3">
+              <option value="">Seleccionar autor</option>
+              {authors.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
+            </select>
+            <input value={form.isbn} onChange={(e) => setForm({...form, isbn: e.target.value})} placeholder="ISBN" className="p-3" />
+            <input value={form.genre} onChange={(e) => setForm({...form, genre: e.target.value})} placeholder="Género" className="p-3" />
+            <input value={form.publishedYear} onChange={(e) => setForm({...form, publishedYear: e.target.value})} placeholder="Año" className="p-3" />
+            <input value={form.pages} onChange={(e) => setForm({...form, pages: e.target.value})} placeholder="Páginas" className="p-3" />
+            <input value={form.imageUrl} onChange={(e) => setForm({...form, imageUrl: e.target.value})} placeholder="URL de imagen (opcional)" className="p-3" />
+            <label className="flex cursor-pointer items-center justify-center rounded-xl border border-dashed border-gray-300 bg-gray-50 px-4 py-3 text-sm font-semibold text-gray-600 transition hover:border-amber-400 hover:bg-amber-50">
+              Cargar imagen
+              <input type="file" accept="image/*" onChange={(e) => readImageFile(e.target.files?.[0])} className="hidden" />
+            </label>
+            {(form.imageUrl || form.imageData) && (
+              <div className="mt-3 flex flex-wrap items-center gap-2 text-sm text-gray-600 md:col-span-3">
+                <span className="rounded-full bg-amber-50 px-3 py-1 font-medium text-amber-700">Imagen seleccionada</span>
+                <button type="button" onClick={() => setForm({ ...form, imageUrl: '', imageData: '' })} className="rounded-full border border-red-200 px-3 py-1 font-semibold text-red-600 transition hover:bg-red-50">Quitar imagen</button>
+              </div>
+            )}
+            <div className="flex gap-2 md:col-span-3">
+              <button className="rounded-full bg-amber-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-amber-600">Crear libro</button>
+              <button type="button" onClick={() => setForm({ title: '', isbn: '', genre: '', publishedYear: '', pages: '', authorId: '', imageUrl: '', imageData: '' })} className="rounded-full border border-gray-200 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-50">Limpiar</button>
+            </div>
+          </form>
+        )}
       </section>
 
       <section className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-gray-100">
@@ -248,12 +263,16 @@ export default function BooksManagerClient({ initialAuthors, initialBooks, initi
         )}
 
         {editingBook && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center">
-            <div className="absolute inset-0 bg-black/40" onClick={()=>setEditingBook(null)} />
-            <div className="relative max-w-3xl w-full p-6">
-              <div className="rounded-2xl bg-white p-6 shadow-lg">
-                <h3 className="mb-4 text-lg font-semibold">Editar libro</h3>
-                {/* @ts-ignore */}
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm transition-opacity duration-200">
+            <button className="absolute inset-0 cursor-default" aria-label="Cerrar modal de edición" onClick={()=>setEditingBook(null)} />
+            <div className="relative w-full max-w-2xl">
+              <div className="max-h-[88vh] overflow-y-auto rounded-2xl bg-white p-5 shadow-2xl ring-1 ring-white/30 md:p-6">
+                <div className="mb-4 flex items-center justify-between gap-4">
+                  <h3 className="text-lg font-semibold text-gray-800">Editar libro</h3>
+                  <button type="button" onClick={()=>setEditingBook(null)} className="flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 text-xl leading-none text-gray-600 transition hover:bg-gray-50" aria-label="Cerrar">
+                    ×
+                  </button>
+                </div>
                 <BookEditClient initial={editingBook} onClose={()=>setEditingBook(null)} onSaved={async ()=>{ setEditingBook(null); await fetchBooks(1) }} />
               </div>
             </div>

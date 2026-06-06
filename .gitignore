@@ -3,15 +3,17 @@ node_modules/
 .pnp
 .pnp.*
 
-# Next.js
+# Next.js / Vercel
 .next/
 out/
+.vercel/
 
-# Production builds
+# Production builds and caches
 dist/
 build/
-
-# TypeScript
+.turbo/
+coverage/
+.eslintcache
 *.tsbuildinfo
 next-env.d.ts
 
@@ -19,6 +21,7 @@ next-env.d.ts
 src/generated/prisma/
 *.db
 *.db-journal
+*.db-wal
 
 # Environment files
 .env
@@ -33,30 +36,15 @@ yarn-error.log*
 pnpm-debug.log*
 seed-output.log
 
-# Testing and cache
-coverage/
-.eslintcache
-.turbo/
+# Uploaded assets generated at runtime
+/public/uploads/
 
-# Deployments
-.vercel/
-
-# OS and editor files
+# OS, editor, and local tool state
 .DS_Store
 Thumbs.db
 *.pem
 .idea/
 .vscode/
-
-# Local tool state
 .history/
 .codex/
 .agents/
-
-# Uploaded assets (ignore runtime uploads if used)
-/public/uploads/
-
-# Local env overrides (explicit)
-.env.local
-.env.development.local
-.env.production.local

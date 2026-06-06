@@ -3,6 +3,8 @@ import AuthorsPanelClient from './components/AuthorsPanelClient'
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 
+export const dynamic = 'force-dynamic'
+
 export default async function Home() {
   const authors = await prisma.author.findMany({ orderBy: { name: 'asc' }, include: { _count: { select: { books: true } } } })
   return (

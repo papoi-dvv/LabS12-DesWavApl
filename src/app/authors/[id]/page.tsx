@@ -7,40 +7,62 @@ import StatsPanelClient from './components/StatsPanelClient'
 import AuthorEditClient from './components/AuthorEditClient'
 import AddBookClient from './components/AddBookClient'
 
+export const dynamic = 'force-dynamic'
+
 type Props = { params: Promise<{ id: string }> }
 
 export default async function Page({ params }: Props) {
-  const resolved = await params
-  const id = resolved.id
+  const resolvedParams = await params
+  const id = resolvedParams.id
 
-  const author = await prisma.author.findUnique({
-    where: { id },
-    include: { books: { orderBy: { publishedYear: 'desc' } } }
-  })
+  const [author, aggregateStats, firstBook, latestBook, longestBook, shortestBook, genresByName] = await Promise.all([
+    prisma.author.findUnique({
+      where: { id },
+      include: { books: { orderBy: { publishedYear: 'desc' } } },
+    }),
+    prisma.book.aggregate({
+      where: { authorId: id },
+      _count: { _all: true },
+      _avg: { pages: true },
+    }),
+    prisma.book.findFirst({
+      where: { authorId: id, publishedYear: { not: null } },
+      orderBy: { publishedYear: 'asc' },
+      select: { title: true, publishedYear: true },
+    }),
+    prisma.book.findFirst({
+      where: { authorId: id, publishedYear: { not: null } },
+      orderBy: { publishedYear: 'desc' },
+      select: { title: true, publishedYear: true },
+    }),
+    prisma.book.findFirst({
+      where: { authorId: id, pages: { not: null } },
+      orderBy: { pages: 'desc' },
+      select: { title: true, pages: true },
+    }),
+    prisma.book.findFirst({
+      where: { authorId: id, pages: { not: null } },
+      orderBy: { pages: 'asc' },
+      select: { title: true, pages: true },
+    }),
+    prisma.book.groupBy({
+      by: ['genre'],
+      where: { authorId: id, genre: { not: null } },
+    }),
+  ])
 
   if (!author) {
     return <div className="p-6 text-gray-700">Autor no encontrado</div>
   }
 
-  // compute stats server-side
-  const totalBooks = await prisma.book.count({ where: { authorId: id } })
-  const avgPagesResult = await prisma.book.aggregate({ where: { authorId: id }, _avg: { pages: true } })
-  const averagePages = avgPagesResult._avg.pages ?? null
-  const firstBook = await prisma.book.findFirst({ where: { authorId: id, publishedYear: { not: null } }, orderBy: { publishedYear: 'asc' }, select: { id: true, title: true, publishedYear: true } })
-  const latestBook = await prisma.book.findFirst({ where: { authorId: id, publishedYear: { not: null } }, orderBy: { publishedYear: 'desc' }, select: { id: true, title: true, publishedYear: true } })
-  const longestBook = await prisma.book.findFirst({ where: { authorId: id, pages: { not: null } }, orderBy: { pages: 'desc' }, select: { id: true, title: true, pages: true } })
-  const shortestBook = await prisma.book.findFirst({ where: { authorId: id, pages: { not: null } }, orderBy: { pages: 'asc' }, select: { id: true, title: true, pages: true } })
-  const genresRaw = await prisma.book.findMany({ where: { authorId: id }, select: { genre: true } })
-  const genres = Array.from(new Set(genresRaw.map(g => g.genre).filter(Boolean)))
-
   const stats = {
     authorId: id,
     authorName: author.name,
-    totalBooks,
+    totalBooks: aggregateStats._count._all,
     firstBook: firstBook ? { title: firstBook.title, year: firstBook.publishedYear } : null,
     latestBook: latestBook ? { title: latestBook.title, year: latestBook.publishedYear } : null,
-    averagePages: averagePages ?? 0,
-    genres,
+    averagePages: aggregateStats._avg.pages ? Math.round(aggregateStats._avg.pages) : 0,
+    genres: genresByName.map(({ genre }) => genre).filter((genre): genre is string => Boolean(genre)),
     longestBook: longestBook ? { title: longestBook.title, pages: longestBook.pages } : null,
     shortestBook: shortestBook ? { title: shortestBook.title, pages: shortestBook.pages } : null,
   }

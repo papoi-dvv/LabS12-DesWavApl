@@ -1,120 +1,120 @@
-# Next API Routes — Biblioteca
+# Biblioteca Digital
 
-Proyecto de ejemplo que combina API y UI (Next.js App Router) para gestionar autores y libros.
+Aplicación de biblioteca construida con Next.js App Router para gestionar autores, libros, portadas y fotografías.
 
-Tecnologías principales
-- Next.js 15 (App Router)
+## Stack
+
+- Next.js 16.2.7
+- React 19
 - TypeScript
-- Prisma v7
-- PostgreSQL (ej. Supabase)
-- Tailwind CSS
+- Tailwind CSS 4
+- Prisma 7 con `@prisma/adapter-pg`
+- PostgreSQL, pensado para Supabase
 
-Estructura relevante
-- `src/app/` — rutas App Router (páginas y API)
-- `src/lib/prisma.ts` — singleton PrismaClient (usa adapter `@prisma/adapter-pg` + `pg` Pool)
-- `prisma/schema.prisma` — esquema de la base de datos
-- `prisma.config.ts` — configuración de Prisma (migraciones/seed)
-- `prisma/seed.ts` — script de seed (genera autores y libros)
-- `public/images/books/` — portadas locales (placeholder incluido)
-- `public/images/authors/` — fotos de autores (placeholder incluido)
+## Requisitos
 
-Requisitos
-- Node.js 18+ (recomendado)
-- PostgreSQL accesible (Supabase u otro)
+- Node.js `>=20.9.0`
+- npm 10
+- PostgreSQL accesible desde tu entorno local y desde Vercel
 
-Instalación
+## Instalación Local
+
 ```bash
 npm install
-```
-
-Variables de entorno (ejemplo en `.env`)
-- `DATABASE_URL` — URL de conexión usada en runtime (puede apuntar al pooler de Supabase)
-- `DIRECT_URL` — (opcional) URL directa para operaciones de migración/seed cuando uses pooler
-- `NEXT_PUBLIC_APP_URL` — URL base usada por algunas llamadas `fetch` en Server Components (ej. http://localhost:3000)
-
-Prisma (generar cliente / sincronizar esquema / seed)
-```bash
-# Generar cliente
 npx prisma generate
-
-# Aplicar esquema (db push)
-npx prisma db push
-
-# Ejecutar seed (usa prisma.config.ts -> prisma/seed.ts)
-npx prisma db seed
-```
-
-Notas importantes sobre Prisma v7
-- Prisma v7 usa un motor "client" que requiere una opción de runtime: `adapter` (recomendado) o `accelerateUrl`.
-- Este repositorio incluye `src/lib/prisma.ts` que crea un `pg` Pool y pasa `@prisma/adapter-pg` como `adapter`.
-- Si ves `PrismaClientInitializationError: PrismaClient needs to be constructed with a non-empty, valid PrismaClientOptions`, instala:
-```bash
-npm i @prisma/adapter-pg pg
-```
-- Si el seed falla por timeouts con Supabase pooler, prueba usar la `DIRECT_URL` (puerto 5432) o ejecutar el seed desde una red con salida a Internet sin restricciones.
-
-Ejecución en desarrollo
-```bash
 npm run dev
 ```
 
-Build y producción
+El servidor local queda en `http://localhost:3000`.
+
+## Variables De Entorno
+
+Crea un `.env` local y configura estas variables también en Vercel:
+
 ```bash
-npm run build
-npm start
+DATABASE_URL="postgresql://..."
+DIRECT_URL="postgresql://..."
 ```
 
-Carpeta de imágenes estáticas
-- Guarda portadas en: `public/images/books/`
-- Guarda fotos de autores en: `public/images/authors/`
-- Placeholders incluidos: `public/images/books/placeholder.svg` y `public/images/authors/placeholder.svg`.
+- `DATABASE_URL`: conexión usada por la app en runtime. Para Supabase, usa preferentemente el pooler.
+- `DIRECT_URL`: conexión directa opcional para tareas administrativas como `db push` o seed.
 
-UI / Estilos
-- El proyecto usa Tailwind y sigue la guía en `Estilos.md` (paleta ámbar/índigo, `rounded-xl`, `rounded-full`, tarjetas con `shadow-sm` / `hover:shadow-lg`).
+No subas `.env` al repositorio. El `.gitignore` ya ignora `.env`, `.env.*` y `.vercel/`.
 
-Problemas comunes y soluciones rápidas
-- Error P2002 (unique constraint): el seed usa upsert para evitar duplicados; si ocurre, revisa los datos de entrada.
-- ETIMEDOUT / Connection terminated: revisa que la URL de `DATABASE_URL` sea la correcta y que la red permita conexión al host/puerto.
-- Si Prisma se queja del adapter, confirma que tienes `@prisma/adapter-pg` y `pg` instalados.
+## Base De Datos
 
-Contribuir
-- Crear ramas por funcionalidad y abrir PRs. Mantener componentes pequeños y bien tipados.
+Generar Prisma Client:
 
-Más información
-- Consulta `Estilos.md`, los archivos bajo `src/components` y `src/app` para ver implementaciones y patrones usados.
-
-Notas rápidas y buenas prácticas
-- Reinicio del servidor: después de cambiar el esquema de Prisma ejecuta `npx prisma db push` y `npx prisma generate`, y reinicia el servidor de desarrollo para que cargue el nuevo cliente Prisma.
-- Payloads grandes: la API acepta cargas base64 pero hay un límite por seguridad (10MB). Para archivos grandes es mejor usar un flujo de subida a un almacenamiento (S3/Supabase Storage) y guardar la URL en la BD.
-- Evita guardar imágenes muy pesadas en la base de datos (`imageData` en base64). Prefiere `imageUrl` apuntando a un almacenamiento externo.
-
-Comandos útiles (resumen)
 ```bash
-# instalar dependencias
-npm install
-
-# generar Prisma Client (obligatorio tras cambios en schema)
 npx prisma generate
-
-# aplicar esquema a la base (dev)
-npx prisma db push
-
-# ejecutar seed (usa prisma.config.ts -> prisma/seed.ts)
-npx prisma db seed
-
-# arrancar dev
-npm run dev
 ```
 
-Variables de entorno principales
-- `DATABASE_URL` — URL de conexión a Postgres (runtime)
-- `DIRECT_URL` — (opcional) URL directa para migraciones/seed si usas pooler
-- `NEXT_PUBLIC_APP_URL` — URL base usada por Server Components para construir fetchs (ej. `http://localhost:3000`)
-- `PORT` — puerto (opcional)
+Sincronizar el esquema en desarrollo:
 
-Imagenes y uploads
-- Locales: `public/images/books/` y `public/images/authors/` (placeholders incluidos).
-- Subidas: el frontend puede enviar `imageData` (data URL) o `imageUrl`. Si vas a trabajar con muchos o archivos grandes, configura un bucket y sube el archivo desde el cliente.
+```bash
+npx prisma db push
+```
 
-Problemas frecuentes
-- Si Next.js muestra que no reconoce `export const config` en rutas `app/api`, quita ese export: la configuración de rutas en App Router debe usarse con las claves estáticas y/o mediante comprobaciones en runtime.
+Ejecutar seed:
+
+```bash
+npm run db:seed
+```
+
+El esquema está en `prisma/schema.prisma` y el seed en `prisma/seed.ts`.
+
+## Scripts
+
+```bash
+npm run dev      # desarrollo local
+npm run build    # prisma generate && next build
+npm start        # producción local con next start
+npm run lint     # ESLint
+npm run db:seed  # carga datos iniciales
+```
+
+## Despliegue Manual En Vercel
+
+Configuración recomendada en Vercel:
+
+- Framework Preset: `Next.js`
+- Install Command: `npm install`
+- Build Command: `npm run build`
+- Output Directory: dejar vacío, Vercel detecta Next.js
+- Node.js Version: 20.x o superior
+
+El `package.json` ya está preparado para Vercel:
+
+- `engines.node` exige `>=20.9.0`, requerido por Next 16.
+- `packageManager` fija npm.
+- `build` ejecuta `prisma generate` antes de `next build`.
+- `@prisma/client`, `@prisma/adapter-pg` y `pg` están en `dependencies`, por lo que estarán disponibles en runtime.
+
+Antes de desplegar:
+
+1. Sube el proyecto a GitHub/GitLab/Bitbucket.
+2. Importa el repositorio en Vercel.
+3. Agrega `DATABASE_URL` y, si aplica, `DIRECT_URL` en Project Settings -> Environment Variables.
+4. Ejecuta `npx prisma db push` y `npm run db:seed` desde tu máquina si quieres preparar la base antes del deploy.
+5. Despliega desde Vercel.
+
+## Notas De Prisma Y Supabase
+
+La app crea el cliente Prisma en `src/lib/prisma.ts` usando `DATABASE_URL` primero y `DIRECT_URL` como respaldo. Esto evita que el runtime dependa de una conexión directa cuando conviene usar el pooler de Supabase.
+
+Si ves errores `P1001`, revisa:
+
+- Que `DATABASE_URL` esté definida en Vercel.
+- Que el host y puerto de Supabase sean accesibles.
+- Que el password no tenga caracteres sin escapar en la URL.
+- Que estés usando el pooler para conexiones de runtime.
+
+## Imágenes
+
+- Placeholders locales: `public/images/books/placeholder.svg` y `public/images/authors/placeholder.svg`.
+- La app acepta `imageUrl` o `imageData`.
+- Para producción, es mejor usar Supabase Storage, S3 u otro almacenamiento y guardar solo la URL en la base.
+
+## Estado De Calidad
+
+`npx tsc --noEmit` debe pasar sin errores. `npm run lint` puede señalar deuda pendiente en rutas API si todavía hay tipos `any` o variables sin usar.

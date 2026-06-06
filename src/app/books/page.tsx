@@ -1,21 +1,46 @@
 import React from 'react'
 import Link from 'next/link'
+import type { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 
 import BooksManagerClient from './components/BooksManagerClient'
 
-export default async function Page({ searchParams }: { searchParams?: Record<string, string | string[] | undefined> }) {
-  const params = searchParams || {}
-  const search = typeof params.search === 'string' ? params.search : ''
-  const genre = typeof params.genre === 'string' ? params.genre : undefined
-  const authorName = typeof params.authorName === 'string' ? params.authorName : ''
-  const page = Math.max(1, Number(params.page || 1))
-  const limitRaw = Math.max(1, Number(params.limit || 10))
-  const limit = Math.min(limitRaw, 50)
-  const sortBy = (typeof params.sortBy === 'string' ? params.sortBy : 'createdAt') as 'title' | 'publishedYear' | 'createdAt'
-  const order = (typeof params.order === 'string' ? params.order : 'desc') as 'asc' | 'desc'
+export const dynamic = 'force-dynamic'
 
-  const where: any = {}
+type BooksPageProps = {
+  searchParams: Promise<Record<string, string | string[] | undefined>>
+}
+
+type SortBy = 'title' | 'publishedYear' | 'createdAt'
+type SortOrder = 'asc' | 'desc'
+
+const validSortFields = new Set<SortBy>(['title', 'publishedYear', 'createdAt'])
+const validSortOrders = new Set<SortOrder>(['asc', 'desc'])
+
+function getSingleParam(params: Record<string, string | string[] | undefined>, key: string) {
+  const value = params[key]
+  return Array.isArray(value) ? value[0] : value
+}
+
+function getPositiveInteger(value: string | undefined, fallback: number) {
+  const parsed = Number(value)
+  return Number.isFinite(parsed) && parsed > 0 ? Math.floor(parsed) : fallback
+}
+
+export default async function Page({ searchParams }: BooksPageProps) {
+  const params = await searchParams
+  const search = getSingleParam(params, 'search') ?? ''
+  const genre = getSingleParam(params, 'genre') || undefined
+  const authorName = getSingleParam(params, 'authorName') ?? ''
+  const page = getPositiveInteger(getSingleParam(params, 'page'), 1)
+  const limitRaw = getPositiveInteger(getSingleParam(params, 'limit'), 12)
+  const limit = Math.min(limitRaw, 50)
+  const requestedSortBy = getSingleParam(params, 'sortBy') as SortBy | undefined
+  const requestedOrder = getSingleParam(params, 'order') as SortOrder | undefined
+  const sortBy = requestedSortBy && validSortFields.has(requestedSortBy) ? requestedSortBy : 'createdAt'
+  const order = requestedOrder && validSortOrders.has(requestedOrder) ? requestedOrder : 'desc'
+
+  const where: Prisma.BookWhereInput = {}
   if (search) where.title = { contains: search, mode: 'insensitive' }
   if (genre) where.genre = genre
   if (authorName) where.author = { name: { contains: authorName, mode: 'insensitive' } }

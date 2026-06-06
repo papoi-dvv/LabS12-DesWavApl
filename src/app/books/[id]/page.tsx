@@ -1,13 +1,18 @@
 import React from 'react'
 import ImageWithFallback from '@/components/ImageWithFallback'
 import Link from 'next/link'
+import { prisma } from '@/lib/prisma'
+
+export const dynamic = 'force-dynamic'
 
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {
   const resolved = await params
-  const base = process.env.NEXT_PUBLIC_APP_URL || `http://localhost:${process.env.PORT || 3000}`
-  const res = await fetch(`${base}/api/books/${resolved.id}`, { cache: 'no-store' })
-  if (!res.ok) return <div className="p-6 text-gray-700">Libro no encontrado</div>
-  const book = await res.json()
+  const book = await prisma.book.findUnique({
+    where: { id: resolved.id },
+    include: { author: true },
+  })
+
+  if (!book) return <div className="p-6 text-gray-700">Libro no encontrado</div>
 
   return (
     <main className="min-h-screen bg-gray-100">

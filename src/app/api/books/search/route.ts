@@ -1,26 +1,21 @@
 import { NextResponse } from 'next/server'
+import type { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 
 export async function GET(request: Request) {
   try {
-    let searchParams: URLSearchParams
-    try {
-      searchParams = new URL(request.url).searchParams
-    } catch {
-      const host = request.headers.get('host') ?? 'localhost:3000'
-      searchParams = new URL(request.url, `http://${host}`).searchParams
-    }
+    const searchParams = new URL(request.url).searchParams
 
     const search = searchParams.get('search') ?? ''
     const genre = searchParams.get('genre') || undefined
     const authorName = searchParams.get('authorName') ?? ''
     const page = Math.max(1, parseInt(searchParams.get('page') || '1'))
-    const limitRaw = Math.max(1, parseInt(searchParams.get('limit') || '10'))
+    const limitRaw = Math.max(1, parseInt(searchParams.get('limit') || '12'))
     const limit = Math.min(limitRaw, 50)
     const sortBy = (searchParams.get('sortBy') || 'createdAt') as 'title' | 'publishedYear' | 'createdAt'
     const order = (searchParams.get('order') || 'desc') as 'asc' | 'desc'
 
-    const where: any = {}
+    const where: Prisma.BookWhereInput = {}
 
     if (search) {
       where.title = { contains: search, mode: 'insensitive' }
