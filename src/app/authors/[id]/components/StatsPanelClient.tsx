@@ -14,13 +14,15 @@ type Stats = {
   shortestBook: { title: string; pages: number } | null
 }
 
-export default function StatsPanelClient({ authorId }: { authorId: string }) {
-  const [stats, setStats] = useState<Stats | null>(null)
-  const [loading, setLoading] = useState(true)
+export default function StatsPanelClient({ authorId, initial }: { authorId?: string; initial?: Stats }) {
+  const [stats, setStats] = useState<Stats | null>(initial || null)
+  const [loading, setLoading] = useState(initial ? false : true)
 
   useEffect(() => {
+    if (initial) return
+    if (!authorId) return
     fetch(`/api/authors/${authorId}/stats`).then(r=>r.json()).then(data=>{ setStats(data); setLoading(false) }).catch(e=>{console.error(e); setLoading(false)})
-  }, [authorId])
+  }, [authorId, initial])
 
   if (loading) return <div className="text-sm text-gray-600">Cargando estadisticas...</div>
   if (!stats) return <div className="text-sm text-gray-600">No hay estadisticas</div>

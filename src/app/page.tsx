@@ -1,8 +1,10 @@
 import React from 'react'
 import AuthorsPanelClient from './components/AuthorsPanelClient'
 import Link from 'next/link'
+import { prisma } from '@/lib/prisma'
 
-export default function Home() {
+export default async function Home() {
+  const authors = await prisma.author.findMany({ orderBy: { name: 'asc' }, include: { _count: { select: { books: true } } } })
   return (
     <main className="min-h-screen">
       <section className="bg-indigo-900 text-white">
@@ -19,7 +21,8 @@ export default function Home() {
       </section>
 
       <section className="mx-auto max-w-6xl px-6 py-8">
-        <AuthorsPanelClient />
+        {/* pass authors as initial to avoid client fetch */}
+        <AuthorsPanelClient initial={authors} />
       </section>
     </main>
   )

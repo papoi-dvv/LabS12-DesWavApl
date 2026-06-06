@@ -22,6 +22,29 @@ export default async function Page({ params }: Props) {
     return <div className="p-6 text-gray-700">Autor no encontrado</div>
   }
 
+  // compute stats server-side
+  const totalBooks = await prisma.book.count({ where: { authorId: id } })
+  const avgPagesResult = await prisma.book.aggregate({ where: { authorId: id }, _avg: { pages: true } })
+  const averagePages = avgPagesResult._avg.pages ?? null
+  const firstBook = await prisma.book.findFirst({ where: { authorId: id, publishedYear: { not: null } }, orderBy: { publishedYear: 'asc' }, select: { id: true, title: true, publishedYear: true } })
+  const latestBook = await prisma.book.findFirst({ where: { authorId: id, publishedYear: { not: null } }, orderBy: { publishedYear: 'desc' }, select: { id: true, title: true, publishedYear: true } })
+  const longestBook = await prisma.book.findFirst({ where: { authorId: id, pages: { not: null } }, orderBy: { pages: 'desc' }, select: { id: true, title: true, pages: true } })
+  const shortestBook = await prisma.book.findFirst({ where: { authorId: id, pages: { not: null } }, orderBy: { pages: 'asc' }, select: { id: true, title: true, pages: true } })
+  const genresRaw = await prisma.book.findMany({ where: { authorId: id }, select: { genre: true } })
+  const genres = Array.from(new Set(genresRaw.map(g => g.genre).filter(Boolean)))
+
+  const stats = {
+    authorId: id,
+    authorName: author.name,
+    totalBooks,
+    firstBook: firstBook ? { title: firstBook.title, year: firstBook.publishedYear } : null,
+    latestBook: latestBook ? { title: latestBook.title, year: latestBook.publishedYear } : null,
+    averagePages: averagePages ?? 0,
+    genres,
+    longestBook: longestBook ? { title: longestBook.title, pages: longestBook.pages } : null,
+    shortestBook: shortestBook ? { title: shortestBook.title, pages: shortestBook.pages } : null,
+  }
+
   return (
     <main className="min-h-screen bg-gray-100">
       <section className="bg-indigo-900 text-white">
@@ -46,7 +69,7 @@ export default async function Page({ params }: Props) {
       <section className="mx-auto grid max-w-5xl grid-cols-1 gap-6 px-6 py-8 md:grid-cols-3">
         <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-gray-100">
           <h2 className="mb-4 text-xl font-semibold text-gray-800">Estadisticas</h2>
-          <StatsPanelClient authorId={author.id} />
+          <StatsPanelClient initial={stats} />
         </div>
         <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-gray-100 md:col-span-2">
           <h2 className="mb-4 text-xl font-semibold text-gray-800">Libros ({author.books.length})</h2>

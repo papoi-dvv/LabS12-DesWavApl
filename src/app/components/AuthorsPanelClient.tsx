@@ -23,7 +23,7 @@ type Author = {
 
 const emptyForm = { name: '', email: '', nationality: '', birthYear: '', imageUrl: '', imageData: '' }
 
-export default function AuthorsPanelClient() {
+export default function AuthorsPanelClient({ initial }: { initial?: Author[] }) {
   const [authors, setAuthors] = useState<Author[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -53,8 +53,13 @@ export default function AuthorsPanelClient() {
   }
 
   useEffect(() => {
+    if (initial && Array.isArray(initial)) {
+      setAuthors(initial)
+      setLoading(false)
+      return
+    }
     void fetchAuthors(false)
-  }, [])
+  }, [initial])
 
   async function submit(e: React.FormEvent) {
     e.preventDefault()

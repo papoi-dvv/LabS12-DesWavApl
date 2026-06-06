@@ -23,7 +23,7 @@ type Book = {
   imageData?: string | null
 }
 
-export default function BooksManagerClient() {
+export default function BooksManagerClient({ initialAuthors, initialBooks, initialPagination }: { initialAuthors?: Author[]; initialBooks?: Book[]; initialPagination?: { page: number; total: number; totalPages: number } }) {
   const [authors, setAuthors] = useState<Author[]>([])
   const [books, setBooks] = useState<Book[]>([])
   const [loading, setLoading] = useState(true)
@@ -99,10 +99,24 @@ export default function BooksManagerClient() {
   }, [authors, authorId, genre, limit, order, page, search, sortBy])
 
   useEffect(() => {
-    void fetchAuthors()
-  }, [])
+    if (initialAuthors && Array.isArray(initialAuthors)) {
+      setAuthors(initialAuthors)
+    } else {
+      void fetchAuthors()
+    }
+  }, [initialAuthors])
 
   useEffect(() => {
+    if (initialBooks && Array.isArray(initialBooks)) {
+      setBooks(initialBooks)
+      if (initialPagination) {
+        setTotal(initialPagination.total ?? 0)
+        setPage(initialPagination.page ?? 1)
+        setTotalPages(initialPagination.totalPages ?? 1)
+      }
+      setLoading(false)
+      return
+    }
     void fetchBooks()
   }, [fetchBooks])
 
